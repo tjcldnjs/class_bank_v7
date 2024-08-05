@@ -16,7 +16,6 @@ java {
 
 configurations {
 	compileOnly {
-		extendsFrom annotationProcessor
 	}
 }
 
