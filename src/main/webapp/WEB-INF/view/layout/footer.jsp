@@ -5,7 +5,8 @@
 <div class="jumbotron text-center" style="margin-bottom: 0">
 	<p>Footer</p>
 </div>
-
+</div>
+	</div>
 </body>
 </html>
 <!-- end of footer.jsp -->
