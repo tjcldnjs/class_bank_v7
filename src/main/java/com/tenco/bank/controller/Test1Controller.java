@@ -9,9 +9,9 @@ import com.tenco.bank.repository.model.User;
 
 // Controller -> String (뷰리졸버 동작 --> JSP 파일 찾아서 렌더링 처리 한다.)
 // RestController --> 데이터를 반환 처리
+
 @RestController // @Controller + @ResponseBody
 public class Test1Controller {
-
 	// http://localhost:8080/test1
 	@GetMapping("/test1")
 	public User test1() {
