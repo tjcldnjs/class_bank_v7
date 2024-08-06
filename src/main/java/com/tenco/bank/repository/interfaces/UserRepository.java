@@ -9,7 +9,8 @@ import com.tenco.bank.repository.model.User;
 // 마이바티스 설정 확인
 
 // UserRepository 인터페스와 user.xml 파일을 매칭 시킨다.
-@Mapper // 반드시 선언을 해야 동작한다.
+
+@Mapper
 public interface UserRepository {
 
 	public int insert(User user);

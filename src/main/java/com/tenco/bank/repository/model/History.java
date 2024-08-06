@@ -14,6 +14,7 @@ import lombok.ToString;
 @Builder
 @ToString
 public class History {
+
 	private Integer id;
 	private Long amount;
 	private Long wBalance;
@@ -22,3 +23,7 @@ public class History {
 	private Integer dAccountId;
 	private Timestamp createdAt;
 }
+
+
+
+
