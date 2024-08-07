@@ -21,6 +21,7 @@ spring:
       - classpath:db/table.sql
       data-locations:
       - classpath:db/data.sql
+      # 서버 재실행하면 초기 init 값 초기화
   h2:
     console:
       enabled: true #H2 데이터 베이스 콘솔을 활성화 합니다.   
