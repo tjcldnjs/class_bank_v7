@@ -1,6 +1,5 @@
 package com.tenco.bank.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.tenco.bank.dto.SaveDTO;
 import com.tenco.bank.handler.exception.DataDeliveryException;
 import com.tenco.bank.handler.exception.UnAuthorizedException;
-import com.tenco.bank.repository.interfaces.AccountRepository;
-import com.tenco.bank.repository.model.Account;
 import com.tenco.bank.repository.model.User;
 import com.tenco.bank.service.AccountService;
 
@@ -56,7 +53,7 @@ public class AccountController {
 	 */
 	
 	@PostMapping("/save")
-	public String savePRoc(SaveDTO dto) {
+	public String saveProc(SaveDTO dto) {
 		// 1. form 데이터 추출 (파싱 전략)
 		// 2. 인증 검사
 		// 3. 유효성 검사

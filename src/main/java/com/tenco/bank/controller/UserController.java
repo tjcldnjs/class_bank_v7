@@ -88,7 +88,7 @@ public class UserController {
 	}
 	
 	/**
-	 * 회원가입 요청처리
+	 * 로그인 요청처리
 	 * 주소설계 : http://localhost:8080/user/sign-in
 	 * @return
 	 */
