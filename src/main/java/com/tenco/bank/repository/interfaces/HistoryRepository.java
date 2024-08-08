@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.tenco.bank.repository.model.History;
 
 // HistoryRepository 인터페이스와 history.xml 파일을 매칭 시킨다.
-
+@Mapper
 public interface HistoryRepository {
 
 	public int insert(History history);
