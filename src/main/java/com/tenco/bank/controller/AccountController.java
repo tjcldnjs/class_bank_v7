@@ -1,13 +1,16 @@
 package com.tenco.bank.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.tenco.bank.dto.DepositDTO;
 import com.tenco.bank.dto.SaveDTO;
@@ -16,6 +19,7 @@ import com.tenco.bank.dto.WithdrawalDTO;
 import com.tenco.bank.handler.exception.DataDeliveryException;
 import com.tenco.bank.handler.exception.UnAuthorizedException;
 import com.tenco.bank.repository.model.Account;
+import com.tenco.bank.repository.model.HistoryAccount;
 import com.tenco.bank.repository.model.User;
 import com.tenco.bank.service.AccountService;
 import com.tenco.bank.utils.Define;
@@ -43,7 +47,7 @@ public class AccountController {
 	 */
 	@GetMapping("/save")
 	public String savePage() {
-
+		
 		// 1. 인증 검사가 필요(account 전체 필요함)
 		User principal = (User) session.getAttribute(Define.PRINCIPAL);
 		if (principal == null) {
@@ -55,6 +59,7 @@ public class AccountController {
 
 	/**
 	 * 계좌 생성 기능 요청 주소설계 : http://localhost:8080/account/save 추후 계좌 목록 페이지 이동 처리
+	 * 
 	 */
 
 	@PostMapping("/save")
@@ -79,10 +84,10 @@ public class AccountController {
 		if (dto.getBalance() == null || dto.getBalance() < 0) {
 			throw new DataDeliveryException(Define.ENTER_YOUR_BALANCE, HttpStatus.BAD_REQUEST);
 		}
-
+		
 		accountService.createAccount(dto, principal.getId());
 
-		return "redirect:/index";
+		return "redirect:/account/list";
 	}
 
 	/**
@@ -190,7 +195,7 @@ public class AccountController {
 			throw new DataDeliveryException(Define.ENTER_YOUR_ACCOUNT_NUMBER, HttpStatus.BAD_REQUEST);
 		}
 
-		accountService.updateAccountDepoist(dto, principal.getId());
+		accountService.updateAccountDeposit(dto, principal.getId());
 
 		return "redirect:/account/list";
 	}
@@ -235,5 +240,39 @@ public class AccountController {
 		accountService.updateAccountTransfer(dto, principal.getId());
 
 		return "redirect:/account/list";
+	}
+	
+	/**
+	 * 계좌 상세 보기 페이지
+	 * 주소 설계 : localhost:8080/account/detail/1?type=all, deposit, withdraw
+	 * @return
+	 */
+	@GetMapping("/detail/{accountId}")
+	public String detail(@PathVariable(name = "accountId") Integer accountId, @RequestParam(required = false, name = "type") String type, Model model) {
+		// required = false 일 경우 쿼리스트링 없어도 null 로 반환된다.  true 일 경우 쿼리스트링 없으면 오류 뜬다.
+		
+		// 1. 인증검사
+		User principal = (User) session.getAttribute(Define.PRINCIPAL);
+		if (principal == null) {
+			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
+		}
+		
+		// 2. 유효성 검사
+		List<String> validTypes = Arrays.asList("all","deposit","withdrawal");
+		
+		// 여기에 포함되어있는 녀석이 아니라면
+		if(!validTypes.contains(type)) {
+			throw new DataDeliveryException("유효하지 않은 접근입니다", HttpStatus.BAD_REQUEST);
+		}
+		
+		Account account = accountService.readAccountById(accountId);
+		List<HistoryAccount> historyList = accountService.readHistoryByAccountID(type, accountId);
+		
+		System.out.println("@PathVariable : " + accountId);
+		System.out.println("@RequestParam : " + type);
+		
+		model.addAttribute("account", account);
+		model.addAttribute("historyList", historyList);
+		return "account/detail";
 	}
 }

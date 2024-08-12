@@ -1,5 +1,6 @@
 package com.tenco.bank.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -17,6 +18,7 @@ import com.tenco.bank.repository.interfaces.AccountRepository;
 import com.tenco.bank.repository.interfaces.HistoryRepository;
 import com.tenco.bank.repository.model.Account;
 import com.tenco.bank.repository.model.History;
+import com.tenco.bank.repository.model.HistoryAccount;
 import com.tenco.bank.utils.Define;
 
 @Service
@@ -46,13 +48,13 @@ public class AccountService {
 		try {
 			result = accountRepository.insert(dto.toAccount(principalId));
 		} catch (DataAccessException e) {
-			throw new DataDeliveryException("잘못된 요청입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			throw new RedirectException("알 수 없는 오류입니다.", HttpStatus.SERVICE_UNAVAILABLE);
+			throw new RedirectException(Define.UNKNOWN, HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
 		if (result == 0) {
-			throw new DataDeliveryException("정상 처리 되지 않았습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -65,9 +67,9 @@ public class AccountService {
 		try {
 			accountListEntity = accountRepository.findByUserId(userId);
 		} catch (DataAccessException e) {
-			throw new DataDeliveryException("잘못된 처리 입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			throw new RedirectException("알 수 없는 오류", HttpStatus.SERVICE_UNAVAILABLE);
+			throw new RedirectException(Define.UNKNOWN, HttpStatus.SERVICE_UNAVAILABLE);
 		}
 
 		return accountListEntity;
@@ -119,7 +121,7 @@ public class AccountService {
 	}
 
 	@Transactional
-	public void updateAccountDepoist(DepositDTO dto, Integer principalId) {
+	public void updateAccountDeposit(DepositDTO dto, Integer principalId) {
 		// 입금 기능만들기
 		Account accountEntity = accountRepository.findByNumber(dto.getDAccountNumber());
 		// 1. 계좌 존재여부 확인
@@ -133,8 +135,6 @@ public class AccountService {
 		accountEntity.deposit(dto.getAmount());
 		accountRepository.updateById(accountEntity);
 
-		// 내 계좌에서 입금했는데 왜 잔액이 늘어남?
-		System.out.println(accountEntity.getBalance() - dto.getAmount() + "dassdadsasdasda1`1111111");
 
 		// 4. 거래내역 등록
 		History history = new History();
@@ -165,18 +165,25 @@ public class AccountService {
 		}
 		// 3. 출금 계좌 본인 소유 확인 -- 객체 상태값과 세션 아이디 비교
 		wAccountEntity.checkOwner(principalId);
+		
 		// 4. 출금 계좌 비밀 번호 확인 -- 객체 상태값과 dto 비밀번호 비교
 		wAccountEntity.checkPassword(dto.getPassword());
+		
 		// 5. 출금 계좌 잔액 여부 확인 -- 객체 상태값 확인, dto와 비교
 		wAccountEntity.checkBalance(dto.getAmount());
+		
 		// 6. 입금 계좌 객체 상태값 변경 처리 (거래금액 증가)
 		dAccountEntity.deposit(dto.getAmount());
+		
 		// 7. 입금 계좌 -- update 처리
 		accountRepository.updateById(dAccountEntity);
+		
 		// 8. 출금 계좌 객체 상태값 변경 처리 (잔액 - 거래금액)
 		wAccountEntity.withdraw(dto.getAmount());
+		
 		// 9. 출금 계좌 -- update 처리
 		accountRepository.updateById(wAccountEntity);
+		
 		// 10. 거래 내역 등록 처리
 		History history = new History();
 		history.setAmount(dto.getAmount());
@@ -190,6 +197,33 @@ public class AccountService {
 			throw new DataDeliveryException(Define.FAILED_PROCESSING, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		// 11. 트랜잭션 처리                     
+		
+	}
+	
+	/**
+	 * 단일 계좌 조회 기능
+	 * @param accountId (pk)
+	 * @return
+	 */
+	public Account readAccountById(Integer accountId) {
+		Account accountEntity = accountRepository.finndByAccountId(accountId);
+		if(accountEntity == null) {
+			throw new DataDeliveryException(Define.NOT_EXIST_ACCOUNT, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return accountEntity;
+	}
+	
+	/**
+	 * 단일 계좌 거래 내역 조회
+	 * @param type = [all, deposit, withdrawal]
+	 * @param accountId (pk)
+	 * @return 전체, 입금, 출금 거래내역 (3가지 타입) 반환
+	 */
+	// @Transactional
+	public List<HistoryAccount> readHistoryByAccountID(String type, Integer accountId) {
+		List<HistoryAccount> list = new ArrayList<>();
+		list = historyRepository.findByAccountIdAndTypeOfHistory(type, accountId);
+		return list;
 		
 	}
 }
