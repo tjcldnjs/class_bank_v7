@@ -27,5 +27,4 @@ public interface HistoryRepository {
 	// 조인 쿼리, 서브 쿼리, 동적쿼리, type=all, deposit , accountId
 	public List<HistoryAccount> findByAccountIdAndTypeOfHistory(@Param("type") String type,
 			@Param("accountId") Integer accountId);
-
 }
