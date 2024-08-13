@@ -30,7 +30,7 @@ public class AuthInterceptor implements HandlerInterceptor{
 		if(principal == null) {
 			throw new UnAuthorizedException("로그인 먼저 해주세요", HttpStatus.UNAUTHORIZED);
 		}
-		
+		// throw 걸리면 밑으로 안내려감
 		return true;
 	}
 	
@@ -40,7 +40,6 @@ public class AuthInterceptor implements HandlerInterceptor{
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
-		// TODO Auto-generated method stub
 		HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
 	}
 	
@@ -49,7 +48,6 @@ public class AuthInterceptor implements HandlerInterceptor{
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-		// TODO Auto-generated method stub
 		HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
 	}
 
