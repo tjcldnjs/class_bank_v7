@@ -1,11 +1,18 @@
 package com.tenco.bank.controller;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.tenco.bank.dto.SignInDTO;
 import com.tenco.bank.dto.SignUpDTO;
@@ -120,6 +127,19 @@ public class UserController {
 		// HTTP 세션을 무효화 (세션의 모든 데이터가 제거되고 세션이 종료)
 		session.invalidate(); 
 		return "redirect:/user/sign-in";
+	}
+	
+	@GetMapping("/kakao")
+	@ResponseBody
+	public ResponseEntity<?> kakaoToken(@RequestParam(name = "code", required = false) String code) {
+		System.out.println(code);
+		URI uri = UriComponentsBuilder.fromUriString("http://localhost:8080/")
+				.path("?" + code).build().toUri();
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+		
+		
+		return ResponseEntity.status(HttpStatus.OK).body(response.getBody());
 	}
 
 }
