@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 @Builder
-public class DepositDTO {
-
-	private Long amount;
-	private String dAccountNumber;
-	
+@ToString
+public class BlogDTO {
+	private int id;
+	private String title;
+	private String content;
+	private String name;
 }

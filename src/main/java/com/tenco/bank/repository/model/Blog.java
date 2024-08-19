@@ -1,4 +1,4 @@
-package com.tenco.bank.dto;
+package com.tenco.bank.repository.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,15 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @ToString
-
-public class WithdrawalDTO {
-
-	private Long amount;
-	private String wAccountNumber;
-	private String wAccountPassword;
-	
+public class Blog {
+	private int id;
+	private String title;
+	private String content;
+	private String name;
 }
